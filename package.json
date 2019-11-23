@@ -40,5 +40,8 @@
 		"eslint-plugin-import": "2.18.2",
 		"ts-node": "8.5.2",
 		"typescript": "3.7.2"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }
