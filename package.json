@@ -6,7 +6,7 @@
 		"Project References",
 		"monorepo"
 	],
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"author": "Anton Bessonov",
 	"main": "./dist/index.js",
 	"license": "MIT",
