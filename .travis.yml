@@ -1,0 +1,27 @@
+language: node_js
+
+cache:
+  npm: false
+
+before_install:
+- curl -L https://unpkg.com/@pnpm/self-installer | node
+
+install:
+- pnpm install
+
+script:
+- pnpm run precommit
+
+deploy:
+- provider: npm
+  edge: true
+  # leave dist directory
+  skip_cleanup: true
+  api_key:
+    secure: GuZ4V8x2m2GtduukJh3rpaezIplvjOcsUy14fui1XrC3tQy5w52cQvl/04tqWyWNCdxTTQttENaH4POY6hG/5192BhPFNkzBW8k6luL2ktWt+DWMWMwtdnt9ex0X+LDHKNyoMZ+YgrOwPaV4UcxTDG8K7+0Q3yDrIJaN4VQJNLm1iT4CRJUibHf6fhHXYbCk0Tr1niy1tNPog1kkFUEr3D4hy86WbuuBdp3m4QhEaqKZkbfyjZoSKlCAZtBL5bjbTLA7h5GZQFqsT2vR9quUwFy7Xo/3wFWEfdJyoxgrlnU1QZt1WVfDx6iMRImOA0O9u3mm0FMm4J9yAUdzuZq+47iapJSpyC2ctzEIrLdrgnXUrklLVl10xEMEGHtdPKJ5a31KG3iXfO7ENfLRNXY+1IqTKaLCjMjpCR0TRO5zvL3K5Zn4tHaU343FKowKmnhKWBFveGb66dmSM2QslaULYvB1AWLDsc2fwrbsSocpjmK3Ab5RzU1PG73Yv65i6u70tpTFDAj3+uICEjzbreMhvzl6QSOdFBGrCRn7R6/zaRL4pNX/H2AZlTIDP9D2XaFQC0B02H1+1u34ybFogR624UXFK8i28Cu/ei6tgjrFZjcJBl+LVfBiA0N56cnYpU3yqO/jat89f6vunwMPCYC7kb6cI90Cx3GoUOQtzJvNL/I=
+  email:
+    secure: BOupNyUZssjnIvETZoGly9D+LVj9kQhRv89VCzLsFQV2nvZDNhBNGWlLZAqCrbZh6rXuBN0oM3DpfzTb9HehBVDdevr6KdlYwm9jhauL6XXNkgKMbooVikF5OtlU64i3p2KkozSwYkxcn8xLYIp9FwqDIobs/9obzVJRqz+1AKIfAVb6BFjSv6Pp6Y4AawS6PRM9/k/kYYXoQc9ivVrOi+CXUL8/UPS7xURTxDmkWMp4PMRT51hW7Yz3J0EpeUE4nxgQPqHuqv3cz+nlckR+lSI2QPokBVM2+tUc1KJhAKzAjXq0DphnAM/qnZIXBfOukpd6SAzjhRs0UZYfJ/2xroocGZv9yLjrVjiaXYcZmh6X48Lcxdl/3/SJwKfNRG4L+hI04/wEkjBckYnMZ6flmvvlsEWpgt2mVsgqqR/6u39cYggFzhE1km1cf+vWIzNSTTNdKsNSwkanT1r+5SoKsXxxPqQbhWNXh+mUFqWi30vlNbDGyd7O7ckzXgXGp1iq57wjXQcYQSkAsFZhwN4ZAfPMf3seIRU500+j2Ahn+WM1rurowKyoYBeQJ45Ab1cY3ZdsRAo3eGec1EviCWwLfbqJgFP9T3XQoNrj2NbdsFUa1Xrm9Fs5Ge+dxnRHokj4zFJIM0mktPpqe4psRLdtP17LzhkDGPU1K8FmxPXai/E=
+  on:
+    repo: Bessonov/set-project-references
+    tags: true
+    condition: "$TRAVIS_PULL_REQUEST = false"

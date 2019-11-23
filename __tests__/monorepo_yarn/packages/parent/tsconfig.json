@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"target": "es5",
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"pretty": true,
+		"strict": true,
+		"alwaysStrict": true,
+		"strictNullChecks": true,
+		"declaration": true,
+		"resolveJsonModule": true,
+		"sourceMap": true,
+		"rootDir": "./src",
+		"outDir": "./dist"
+	}
+}

@@ -1,0 +1,44 @@
+{
+	"name": "@bessonovs/set-project-references",
+	"description": "Set project references for TypeScript",
+	"keywords": [
+		"TypeScript",
+		"Project References",
+		"monorepo"
+	],
+	"version": "0.0.1",
+	"author": "Anton Bessonov",
+	"main": "./dist/index.js",
+	"license": "MIT",
+	"repository": "Bessonov/set-project-references",
+	"sideEffects": false,
+	"scripts": {
+		"start": "ts-node ./src/index.ts",
+		"build": "tsc --build",
+		"cli": "node ./build/index.js",
+		"lint": "eslint . --ext .ts,.js",
+		"test": "echo 'no tests'",
+		"precommit": "$_ run test && $_ run lint && $_ run build"
+	},
+	"bin": {
+		"set-project-references": "./dist/index.js"
+	},
+	"dependencies": {
+		"commander": "4.0.1",
+		"detect-indent": "6.0.0",
+		"glob": "7.1.6",
+		"lodash": "4.17.15"
+	},
+	"devDependencies": {
+		"@types/glob": "7.1.1",
+		"@types/lodash": "4.14.149",
+		"@types/node": "12.12.11",
+		"@typescript-eslint/eslint-plugin": "2.8.0",
+		"@typescript-eslint/parser": "2.8.0",
+		"eslint": "6.7.0",
+		"eslint-config-airbnb-base": "14.0.0",
+		"eslint-plugin-import": "2.18.2",
+		"ts-node": "8.5.2",
+		"typescript": "3.7.2"
+	}
+}
