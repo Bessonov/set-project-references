@@ -17,10 +17,10 @@ Installation
 You can run it without an installation:
 ```bash
 pnpx @bessonovs/set-project-references
-npx install @bessonovs/set-project-references
+npx @bessonovs/set-project-references
 ```
 
-Or install for one of your favourite package manager:
+Or install with one of your favourite package manager:
 
 ```bash
 pnpm install -g @bessonovs/set-project-references
@@ -40,6 +40,20 @@ set-project-references
 set-project-references --save
 # change project root
 set-project-references --root mypath/
+```
+
+Or add it as shortcut:
+```json
+"scripts": {
+  "spr": "set-project-references",
+  "postinstall": "set-project-references --save",
+  "postuninstall": "set-project-references --save"
+},
+```
+
+Then you can run it with:
+```bash
+yarn spr
 ```
 
 ToDo
