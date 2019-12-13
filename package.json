@@ -15,7 +15,7 @@
 	"scripts": {
 		"start": "ts-node ./src/index.ts",
 		"build": "tsc --build",
-		"cli": "node ./build/index.js",
+		"cli": "node ./dist/index.js",
 		"lint": "eslint . --ext .ts,.js",
 		"test": "echo 'no tests'",
 		"precommit": "$_ run test && $_ run lint && $_ run build"

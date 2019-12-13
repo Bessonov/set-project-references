@@ -1,25 +1,25 @@
 #!/usr/bin/env node
 
 import program from 'commander'
-import glob from 'glob'
 import path from 'path'
 import fs from 'fs'
-import { promisify } from 'util'
-import { isEqual } from 'lodash'
+import {
+	difference, isEqual,
+} from 'lodash'
 import { version } from './package.json'
-import { Module } from './Module'
+import { Module } from './common/Module'
 import {
 	error, log,
-} from './logging'
-import { PackageJson } from './PackageJson'
+} from './common/logging'
+import { SetProjectReferencesOptions } from './common/SetProjectReferencesOptions'
+import './yarn/YarnWorkspaceManager'
+import { getWorkspaceManager } from './common/WorkspaceManager'
+import { TsConfigJson } from './common/TsConfigJson'
+import {
+	guessJsonIndentation, readJson,
+} from './common/utils'
 
 type ModulesMap = { [key: string]: Module }
-
-interface SetProjectReferencesOptions {
-	root: string | undefined
-	save: true | undefined
-	indentationTsConfig: string | undefined
-}
 
 function getReferences(module: Module, modulesMap: ModulesMap): string[] {
 	const result: string[] = []
@@ -48,26 +48,13 @@ function getReferences(module: Module, modulesMap: ModulesMap): string[] {
 }
 
 async function setProjectReferences(options: SetProjectReferencesOptions): Promise<void> {
-	const root = options.root || process.cwd()
-	const rootPackageJsonFile = `${root}/package.json`
-	log(`Looking for project root in ${rootPackageJsonFile}`)
+	const workspaceManager = getWorkspaceManager(options)
 
-	const packageJson: PackageJson = JSON.parse(
-		fs.readFileSync(rootPackageJsonFile, { encoding: 'utf8' }),
-	)
-	const pattern = `${root}/${packageJson.workspaces}/package.json`
-	log(`Looking for modules in ${pattern}`)
-
-	const files = await promisify(glob)(pattern)
-
-	const modules = files.map((file) => {
-		const modulePath = file.replace('/package.json', '')
-		return new Module(modulePath)
-	})
+	const modules = await workspaceManager.getModules()
 
 	const modulesMap = modules.reduce<ModulesMap>(
 		// eslint-disable-next-line no-param-reassign
-		(stash, module) => { stash[module.packageJson.name] = module; return stash },
+		(stash, module) => { stash[module.getName()] = module; return stash },
 		{},
 	)
 
@@ -90,13 +77,50 @@ async function setProjectReferences(options: SetProjectReferencesOptions): Promi
 			}
 		}
 	}
+
+	const monorepoTsConfigFile = options.monorepoTsConfig
+	if (monorepoTsConfigFile) {
+		let monorepoTsConfig: TsConfigJson = { files: [] }
+		let indentation = '\t'
+		if (fs.existsSync(monorepoTsConfigFile)) {
+			monorepoTsConfig = JSON.parse(readJson(monorepoTsConfigFile))
+			indentation = guessJsonIndentation(
+				monorepoTsConfigFile,
+				options.indentationTsConfig ?? indentation,
+			)
+		} else {
+			error(`typescript main config file ${monorepoTsConfigFile} doesn't exists`)
+		}
+
+		const currentReferences = (monorepoTsConfig.references || []).map((ref) => ref.path)
+		const desiredReferences = Object.values(modulesMap)
+			.map((module) => path.relative(path.dirname(monorepoTsConfigFile), module.path))
+
+		const missingReferences = difference(desiredReferences, currentReferences)
+		const obsoleteReferences = difference(currentReferences, desiredReferences)
+
+		if (missingReferences.length > 0) {
+			log(`Missing main references: ${JSON.stringify(missingReferences)}`)
+		}
+
+		if (obsoleteReferences.length > 0) {
+			log(`Obsolete main references: ${JSON.stringify(obsoleteReferences)}`)
+		}
+
+		if (options.save) {
+			monorepoTsConfig.references = desiredReferences.sort().map((ref) => ({ path: ref }))
+			const content = JSON.stringify(monorepoTsConfig, null, indentation)
+			fs.writeFileSync(monorepoTsConfigFile, content)
+		}
+	}
 }
 
 program.version(version)
 
 program
-	.option('-r, --root <path>', 'path to the root of monorepo')
-	.option('-s, --save', 'write changes to the files')
+	.option('-r, --root <path>', 'path to the root of monorepo', process.cwd())
+	.option('-m, --monorepo-ts-config <path>', 'path to the typescript main configuration file')
+	.option('-s, --save', 'write changes to the files', false)
 	.option('-t, --indentation-ts-config <chars>', `indentation of tsconfig.json. Use $'\\t' for a tab`)
 	.action(setProjectReferences)
 
