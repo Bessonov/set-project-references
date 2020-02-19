@@ -60,6 +60,10 @@ module.exports = {
 				ignoreDeclarationSort: true,
 			}
 		],
+		'arrow-parens': [
+			'error',
+			'as-needed',
+		],
 		'@typescript-eslint/explicit-function-return-type': 'error',
 		'@typescript-eslint/explicit-member-accessibility': 'off',
 		'@typescript-eslint/no-angle-bracket-type-assertion': 'off',

@@ -14,11 +14,13 @@
 	"sideEffects": false,
 	"scripts": {
 		"start": "ts-node ./src/index.ts",
+		"debug": "node --inspect-brk -r ts-node/register ./src/index.ts",
 		"build": "tsc --build",
 		"cli": "node ./dist/index.js",
 		"lint": "eslint . --ext .ts,.js",
-		"test": "echo 'no tests'",
-		"precommit": "$_ run test && $_ run lint && $_ run build"
+		"test": "jest --coverage",
+		"precommit": "pnpm run test && pnpm run lint && pnpm run build",
+		"update": "pnpm update --interactive --recursive --recursive"
 	},
 	"bin": {
 		"set-project-references": "./dist/index.js"
@@ -27,10 +29,13 @@
 		"commander": "4.0.1",
 		"detect-indent": "6.0.0",
 		"glob": "7.1.6",
+		"js-yaml": "3.13.1",
 		"lodash": "4.17.15"
 	},
 	"devDependencies": {
 		"@types/glob": "7.1.1",
+		"@types/jest": "25.1.2",
+		"@types/js-yaml": "3.12.2",
 		"@types/lodash": "4.14.149",
 		"@types/node": "12.12.11",
 		"@typescript-eslint/eslint-plugin": "2.8.0",
@@ -38,8 +43,10 @@
 		"eslint": "6.7.0",
 		"eslint-config-airbnb-base": "14.0.0",
 		"eslint-plugin-import": "2.18.2",
+		"jest": "25.1.0",
+		"ts-jest": "25.2.0",
 		"ts-node": "8.5.2",
-		"typescript": "3.7.2"
+		"typescript": "3.8.2"
 	},
 	"publishConfig": {
 		"access": "public"
