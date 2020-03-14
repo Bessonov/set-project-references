@@ -1,7 +1,8 @@
 export interface PackageJson {
-	name: string
-	version: string
-	dependencies?: {
-		[key: string]: string
+	readonly name: string
+	readonly version: string
+	readonly dependencies?: {
+		// module name: version
+		readonly [key: string]: string
 	}
 }

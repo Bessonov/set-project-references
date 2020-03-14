@@ -8,7 +8,9 @@ Set project references for TypeScript
 This cli module try to resolve the problem of syncing [TypeScript project references](https://www.typescriptlang.org/docs/handbook/project-references.html) with local modules in a monorepo.
 
 Set project references supports following monorepos:
-- [Yarn Workspaces](https://yarnpkg.com/lang/en/docs/workspaces/)
+- [pnpm workspaces](https://pnpm.js.org/en/workspaces)
+
+Support for [yarn Workspaces](https://yarnpkg.com/lang/en/docs/workspaces/) was removed due rewrite in version 0.0.4.
 
 
 Installation
@@ -53,6 +55,7 @@ Or add it as shortcut:
 
 Then you can run it with:
 ```bash
+pnpm run spr
 yarn spr
 ```
 
@@ -60,7 +63,6 @@ ToDo
 ----
 Currently, it's an alpha version. It's missing:
 - Tests
-- Support of pnpm and lerna
 - Access through API
 
 License

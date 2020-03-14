@@ -1,125 +1,174 @@
 #!/usr/bin/env node
 
+import fs from 'fs'
 import program from 'commander'
 import path from 'path'
-import fs from 'fs'
 import {
-	difference, isEqual,
+	difference, isEqual, merge,
 } from 'lodash'
 import { version } from './package.json'
-import { Module } from './common/Module'
 import {
-	error, log,
-} from './common/logging'
+	Module, flattenModules, groupByName, moduleFactory,
+} from './managers/module/Module'
+import {
+	Workspace, flattenWorkspaces, workspaceFactory,
+} from './managers/Workspace'
+import {
+	getTsConfigJson, saveTsConfigJson,
+} from './managers/module/TsConfigJson'
+import { log } from './common/logging'
 import { SetProjectReferencesOptions } from './common/SetProjectReferencesOptions'
-import './yarn/YarnWorkspaceManager'
-import { getWorkspaceManager } from './common/WorkspaceManager'
-import { TsConfigJson } from './common/TsConfigJson'
-import {
-	guessJsonIndentation, readJson,
-} from './common/utils'
 
-type ModulesMap = { [key: string]: Module }
-
-function getReferences(module: Module, modulesMap: ModulesMap): string[] {
-	const result: string[] = []
-	const { dependencies } = module.packageJson
-
-	for (const [dependency, dependencyVersion] of Object.entries(dependencies || [])) {
-		// it's own module?
-		if (dependency in modulesMap) {
-			const dependencyModule = modulesMap[dependency]
-			const dependencyModuleVersion = dependencyModule.packageJson.version
-
-			// compare versions to ensure linking to right module
-			if (dependencyModule.packageJson.version !== dependencyVersion) {
-				error(`Version ${dependency}@${dependencyVersion} doesn't match `
-					+ `${dependencyModuleVersion} in module ${module.packageJson.name}`)
-				continue // eslint-disable-line no-continue
-			}
-			const referencePath = path.relative(module.path, dependencyModule.path)
-			log(`Module ${module.packageJson.name} has a reference `
-				+ `to ${dependencyModule.packageJson.name} (${referencePath})`)
-			result.push(referencePath)
-		}
+interface ModulesFoundHookProps {
+	groupedModules: {
+		[name: string]: Module
 	}
-
-	return result.sort()
+	options: SetProjectReferencesOptions
 }
 
-async function setProjectReferences(options: SetProjectReferencesOptions): Promise<void> {
-	const workspaceManager = getWorkspaceManager(options)
+interface ConfigurationHooks {
+	searchWorkspaces?: (root: string) => string[]
+	modulesFound?: (props: ModulesFoundHookProps) => ModulesFoundHookProps
+	finish?: (props: FinishHookProps) => void
+}
 
-	const modules = await workspaceManager.getModules()
+interface SetProjectReferencesConfg {
+	hooks: Required<ConfigurationHooks>
+}
 
-	const modulesMap = modules.reduce<ModulesMap>(
-		// eslint-disable-next-line no-param-reassign
-		(stash, module) => { stash[module.getName()] = module; return stash },
-		{},
+function searchWorkspacesHook(root: string): string[] {
+	return [root]
+}
+
+function modulesFoundHook(
+	{ groupedModules }: ModulesFoundHookProps,
+): Pick<ModulesFoundHookProps, 'groupedModules'> {
+	return {
+		groupedModules,
+	}
+}
+interface FinishHookProps {
+	groupedModules: {
+		[name: string]: Module
+	}
+	saveTsConfigJson: typeof saveTsConfigJson
+	options: SetProjectReferencesOptions
+}
+
+function finishHook(): void {
+	// do nothing is the default
+}
+
+function getConfiguration(options: SetProjectReferencesOptions): SetProjectReferencesConfg {
+	const configFile = path.resolve(options.root, 'set-project-references.js')
+	const hooks: ConfigurationHooks | undefined = fs.existsSync(configFile)
+		// eslint-disable-next-line import/no-dynamic-require, global-require
+		? require(configFile)?.hooks
+		: undefined
+
+	return merge(
+		{
+			hooks: {
+				searchWorkspaces: searchWorkspacesHook,
+				modulesFound: modulesFoundHook,
+				finish: finishHook,
+			},
+		},
+		{
+			hooks,
+		},
+	)
+}
+
+function setProjectReferences(options: SetProjectReferencesOptions): void {
+	const configuration = getConfiguration(options)
+
+	const workspaces = configuration.hooks.searchWorkspaces(process.cwd())
+		.map(workspacePath => workspaceFactory(workspacePath, null))
+		.filter((workspace): workspace is Workspace => !!workspace)
+
+	const flatWorkspaces = flattenWorkspaces(workspaces)
+
+	// contain all modules in all workspaces
+	const flatModulesFound = flattenModules(
+		flatWorkspaces
+			.flatMap(workspace => {
+				return workspace.manager.getModulePaths()
+					.flatMap(modulePaths => moduleFactory(
+						path.resolve(workspace.manager.path, modulePaths),
+						workspace,
+					))
+			}),
 	)
 
-	for (const modul of modules) {
-		const desiredReferences = getReferences(modul, modulesMap)
-		const currentReferences = (modul.tsConfigJson.references || []).map((ref) => ref.path)
-		if (isEqual(desiredReferences, currentReferences) === false) {
-			log(`Current refrences ${JSON.stringify(currentReferences)} are `
-				+ `not equal to ${JSON.stringify(desiredReferences)}`)
+	// allows a quick access by module name
+	const groupedModulesFound = groupByName(flatModulesFound)
+
+	const { groupedModules } = configuration.hooks.modulesFound({
+		groupedModules: groupedModulesFound,
+		options,
+	})
+
+	// just for success banner at the end
+	let everythingIsFine = true
+
+	for (const module of Object.values(groupedModules)) {
+		const linkedModules = []
+		for (const [depName] of Object.entries(module.packageJson.content.dependencies ?? {})) {
+			const ownDepModule = groupedModules[depName]
+			// is this module known by our workspace?
+			if (ownDepModule) {
+				// is this module dependency managed by workspace manager?
+				if (module.workspace?.manager.isWorkspaceDependency(module, ownDepModule)) {
+					linkedModules.push(ownDepModule)
+				}
+			}
+		}
+
+		const tsConfig = getTsConfigJson(module.path)
+		// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+		const currentReferences = tsConfig.content.references?.map(reference => reference.path) ?? []
+		const desiredReferences = linkedModules.map(
+			linkedModule => path.relative(module.path, linkedModule.path),
+		)
+
+		if (isEqual(currentReferences, desiredReferences) === false) {
+			everythingIsFine = false
+			const missingReferences = difference(desiredReferences, currentReferences)
+			const obsoleteReferences = difference(currentReferences, desiredReferences)
+
+			if (missingReferences.length > 0) {
+				log(`Module ${module.packageJson.content.name} is missing references: ${
+					JSON.stringify(missingReferences)}`)
+			}
+
+			if (obsoleteReferences.length > 0) {
+				log(`Module ${module.packageJson.content.name} has obsolete references: ${
+					JSON.stringify(obsoleteReferences)}`)
+			}
 
 			if (options.save) {
-				const newReferences = desiredReferences.map((ref) => ({ path: ref }))
-				if (newReferences.length > 0) {
-					modul.tsConfigJson.references = newReferences
-				} else {
-					delete modul.tsConfigJson.references
-				}
-
-				modul.saveTsConfigJson({ indentation: options.indentationTsConfig })
+				tsConfig.content.references = desiredReferences.sort().map(ref => ({ path: ref }))
+				saveTsConfigJson(tsConfig, { indentation: options.indentationTsConfig })
 			}
 		}
 	}
 
-	const monorepoTsConfigFile = options.monorepoTsConfig
-	if (monorepoTsConfigFile) {
-		let monorepoTsConfig: TsConfigJson = { files: [] }
-		let indentation = '\t'
-		if (fs.existsSync(monorepoTsConfigFile)) {
-			monorepoTsConfig = JSON.parse(readJson(monorepoTsConfigFile))
-			indentation = guessJsonIndentation(
-				monorepoTsConfigFile,
-				options.indentationTsConfig ?? indentation,
-			)
-		} else {
-			error(`typescript main config file ${monorepoTsConfigFile} doesn't exists`)
-		}
-
-		const currentReferences = (monorepoTsConfig.references || []).map((ref) => ref.path)
-		const desiredReferences = Object.values(modulesMap)
-			.map((module) => path.relative(path.dirname(monorepoTsConfigFile), module.path))
-
-		const missingReferences = difference(desiredReferences, currentReferences)
-		const obsoleteReferences = difference(currentReferences, desiredReferences)
-
-		if (missingReferences.length > 0) {
-			log(`Missing main references: ${JSON.stringify(missingReferences)}`)
-		}
-
-		if (obsoleteReferences.length > 0) {
-			log(`Obsolete main references: ${JSON.stringify(obsoleteReferences)}`)
-		}
-
-		if (options.save) {
-			monorepoTsConfig.references = desiredReferences.sort().map((ref) => ({ path: ref }))
-			const content = JSON.stringify(monorepoTsConfig, null, indentation)
-			fs.writeFileSync(monorepoTsConfigFile, content)
-		}
+	if (everythingIsFine) {
+		log('Everything is fine.')
 	}
+
+	configuration.hooks.finish({
+		groupedModules,
+		saveTsConfigJson,
+		options,
+	})
 }
 
 program.version(version)
 
 program
 	.option('-r, --root <path>', 'path to the root of monorepo', process.cwd())
-	.option('-m, --monorepo-ts-config <path>', 'path to the typescript main configuration file')
 	.option('-s, --save', 'write changes to the files', false)
 	.option('-t, --indentation-ts-config <chars>', `indentation of tsconfig.json. Use $'\\t' for a tab`)
 	.action(setProjectReferences)
