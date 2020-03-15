@@ -20,7 +20,9 @@ export function workspaceFactory(path: string, parent: Workspace | null): Worksp
 	}
 	const workspace = new Workspace(path, manager, parent)
 	workspace.children = manager.getModulePaths()
-		.map(modulePath => workspaceFactory(modulePath, workspace))
+		// avoid recursive calls
+		// eslint-disable-next-line @typescript-eslint/no-extra-parens
+		.map(modulePath => (modulePath === path ? null : workspaceFactory(modulePath, workspace)))
 		.filter((moduleWorkspaces): moduleWorkspaces is Workspace => !!moduleWorkspaces)
 	return workspace
 }

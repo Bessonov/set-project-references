@@ -1,5 +1,5 @@
 import {
-	fileExists, guessJsonIndentation, readJson, saveJson,
+	guessJsonIndentation, readJson, saveJson,
 } from '../../common/utils'
 
 interface TsConfigJsonContent {
@@ -27,9 +27,6 @@ export interface TsConfigJson {
 
 export function getTsConfigJson(path: string): TsConfigJson {
 	const tsConfigJsonFile = `${path}/tsconfig.json`
-	if (fileExists(tsConfigJsonFile) === false) {
-		throw new Error(`file ${tsConfigJsonFile} must exists`)
-	}
 	const content: TsConfigJsonContent = readJson(tsConfigJsonFile)
 	// TODO: validation of config file
 	return {
