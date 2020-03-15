@@ -137,9 +137,11 @@ function setProjectReferences(options: SetProjectReferencesOptions): void {
 		}
 		// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 		const currentReferences = tsConfig.content.references?.map(reference => reference.path) ?? []
-		const desiredReferences = linkedModules.map(
-			linkedModule => path.relative(module.path, linkedModule.path),
-		)
+		const desiredReferences = linkedModules
+			// create reference only to modules with tsconfig file
+			.filter((linkedModule): linkedModule is Module =>
+				!!nullOnNotfound(() => getTsConfigJson(linkedModule.path)))
+			.map(linkedModule => path.relative(module.path, linkedModule.path))
 
 		if (isEqual(currentReferences, desiredReferences) === false) {
 			everythingIsFine = false
