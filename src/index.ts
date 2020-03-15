@@ -18,6 +18,7 @@ import {
 } from './managers/module/TsConfigJson'
 import { log } from './common/logging'
 import { SetProjectReferencesOptions } from './common/SetProjectReferencesOptions'
+import { nullOnNotfound } from './common/FileUtils'
 
 interface ModulesFoundHookProps {
 	groupedModules: {
@@ -125,7 +126,12 @@ function setProjectReferences(options: SetProjectReferencesOptions): void {
 			}
 		}
 
-		const tsConfig = getTsConfigJson(module.path)
+		const tsConfig = nullOnNotfound(() => getTsConfigJson(module.path))
+		// do not try to edit file, if the file doesn't exists
+		if (!tsConfig) {
+			// eslint-disable-next-line no-continue
+			continue
+		}
 		// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 		const currentReferences = tsConfig.content.references?.map(reference => reference.path) ?? []
 		const desiredReferences = linkedModules.map(
