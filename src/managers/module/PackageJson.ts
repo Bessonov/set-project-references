@@ -14,6 +14,10 @@ interface PackageJsonContent {
 		// module name: version
 		readonly [moduleName: string]: Version
 	}
+	readonly devDependencies?: {
+		// module name: version
+		readonly [moduleName: string]: Version
+	}
 }
 
 export interface PackageJson {
