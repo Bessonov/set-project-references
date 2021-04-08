@@ -1,37 +1,34 @@
-Set project references for TypeScript
-=====================================
+# Set project references for TypeScript
 
-[![Project is](https://img.shields.io/badge/Project%20is-fantastic-ff69b4.svg)](https://github.com/Bessonov/set-project-references)
-[![Build Status](https://api.travis-ci.org/Bessonov/set-project-references.svg?branch=master)](https://travis-ci.org/Bessonov/set-project-references)
-[![License](http://img.shields.io/:license-MIT-blue.svg)](https://raw.githubusercontent.com/Bessonov/set-project-references/master/LICENSE)
+[![License](http://img.shields.io/:license-MIT-blue.svg)](https://raw.githubusercontent.com/creditiq/set-project-references/master/LICENSE)
 
 This cli module try to resolve the problem of syncing [TypeScript project references](https://www.typescriptlang.org/docs/handbook/project-references.html) with local modules in a monorepo.
 
 Set project references supports following monorepos:
+
 - [pnpm workspaces](https://pnpm.js.org/en/workspaces)
 
 Support for [yarn Workspaces](https://yarnpkg.com/lang/en/docs/workspaces/) was removed due rewrite in version 0.0.4.
 
-
-Installation
-------------
+## Installation
 
 You can run it without an installation:
+
 ```bash
-pnpx @bessonovs/set-project-references
-npx @bessonovs/set-project-references
+pnpx @creditiq/set-project-references
+npx @creditiq/set-project-references
 ```
 
 Or install with one of your favourite package manager:
 
 ```bash
-pnpm install -g @bessonovs/set-project-references
-npm install -g @bessonovs/set-project-references
-yarn global add @bessonovs/set-project-references
+pnpm install -g @creditiq/set-project-references
+npm install -g @creditiq/set-project-references
+yarn global add @creditiq/set-project-references
 ```
 
-Usage
------
+## Usage
+
 ```bash
 # show help
 set-project-references -h
@@ -45,6 +42,7 @@ set-project-references --root mypath/
 ```
 
 Or add it as shortcut:
+
 ```json
 "scripts": {
   "spr": "set-project-references",
@@ -54,19 +52,20 @@ Or add it as shortcut:
 ```
 
 Then you can run it with:
+
 ```bash
 pnpm run spr
 yarn spr
 ```
 
-ToDo
-----
+## ToDo
+
 Currently, it's an alpha version. It's missing:
+
 - Tests
 - Access through API
 
-License
--------
+## License
 
 The MIT License (MIT)
 
