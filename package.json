@@ -1,16 +1,16 @@
 {
-	"name": "@bessonovs/set-project-references",
+	"name": "@creditiq/set-project-references",
 	"description": "Set project references for TypeScript",
 	"keywords": [
 		"TypeScript",
 		"Project References",
 		"monorepo"
 	],
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"author": "Anton Bessonov",
 	"main": "./dist/index.js",
 	"license": "MIT",
-	"repository": "Bessonov/set-project-references",
+	"repository": "creditiq/set-project-references",
 	"sideEffects": false,
 	"scripts": {
 		"start": "ts-node ./src/index.ts",
