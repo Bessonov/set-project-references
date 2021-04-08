@@ -84,7 +84,7 @@ function getConfiguration(options: SetProjectReferencesOptions): SetProjectRefer
 function setProjectReferences(options: SetProjectReferencesOptions): void {
 	const configuration = getConfiguration(options)
 
-	const workspaces = configuration.hooks.searchWorkspaces(process.cwd())
+	const workspaces = configuration.hooks.searchWorkspaces(options.root)
 		.map(workspacePath => workspaceFactory(workspacePath, null))
 		.filter((workspace): workspace is Workspace => !!workspace)
 
