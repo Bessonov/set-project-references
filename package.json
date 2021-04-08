@@ -20,6 +20,7 @@
 		"lint": "eslint . --ext .ts,.js",
 		"test": "jest --coverage",
 		"precommit": "pnpm run test && pnpm run lint && pnpm run build",
+		"preversion": "npm run precommit",
 		"update": "pnpm update --interactive --recursive --recursive"
 	},
 	"bin": {
