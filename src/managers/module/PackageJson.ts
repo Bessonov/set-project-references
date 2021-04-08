@@ -7,13 +7,16 @@ interface PackageJsonMeta {
 
 type Version = string
 
+type DependenciesList = {
+	// module name: version
+	readonly [moduleName: string]: Version
+}
+
 interface PackageJsonContent {
 	readonly name: string
 	readonly version: string
-	readonly dependencies?: {
-		// module name: version
-		readonly [moduleName: string]: Version
-	}
+	readonly dependencies?: DependenciesList
+	readonly devDependencies?: DependenciesList
 }
 
 export interface PackageJson {
