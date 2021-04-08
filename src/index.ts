@@ -115,7 +115,10 @@ function setProjectReferences(options: SetProjectReferencesOptions): void {
 
 	for (const module of Object.values(groupedModules)) {
 		const linkedModules = []
-		for (const [depName] of Object.entries(module.packageJson.content.dependencies ?? {})) {
+		for (const [depName] of Object.entries({
+			...module.packageJson.content.dependencies ?? {},
+			...module.packageJson.content.devDependencies ?? {},
+		})) {
 			const ownDepModule = groupedModules[depName]
 			// is this module known by our workspace?
 			if (ownDepModule) {
