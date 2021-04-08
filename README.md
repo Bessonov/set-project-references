@@ -10,7 +10,7 @@ This cli module try to resolve the problem of syncing [TypeScript project refere
 Set project references supports following monorepos:
 - [pnpm workspaces](https://pnpm.js.org/en/workspaces)
 
-Support for [yarn Workspaces](https://yarnpkg.com/lang/en/docs/workspaces/) was removed due rewrite in version 0.0.4.
+Support for [yarn Workspaces](https://yarnpkg.com/lang/en/docs/workspaces/) was removed due rewrite in version 0.0.4. Try [workspaces-to-typescript-project-references](https://github.com/azu/monorepo-utils/tree/master/packages/@monorepo-utils/workspaces-to-typescript-project-references) instead.
 
 
 Installation
