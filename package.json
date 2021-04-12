@@ -27,6 +27,7 @@
 	},
 	"dependencies": {
 		"commander": "4.0.1",
+		"comment-json": "4.1.0",
 		"detect-indent": "6.0.0",
 		"glob": "7.1.6",
 		"js-yaml": "3.13.1",
