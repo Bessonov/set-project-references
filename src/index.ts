@@ -6,6 +6,7 @@ import path from 'path'
 import {
 	difference, isEqual, merge,
 } from 'lodash'
+import JSON from 'comment-json'
 import { version } from './package.json'
 import {
 	Module, flattenModules, groupByName, moduleFactory,

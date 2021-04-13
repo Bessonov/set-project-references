@@ -1,5 +1,6 @@
 import fs from 'fs'
 import detectIndent from 'detect-indent'
+import JSON from 'comment-json'
 import { nullOnNotfound } from './FileUtils'
 
 export function fileExists(filePath: string): boolean {
