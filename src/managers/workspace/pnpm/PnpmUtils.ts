@@ -9,7 +9,9 @@ import { Module } from '../../module/Module'
 export function getPnpmWorkspaceConfig(workspacePath: string): PnpmWorkspaceConfig | null {
 	return nullOnNotfound<PnpmWorkspaceConfig>(() => {
 		const workspaceFile = `${workspacePath}/pnpm-workspace.yaml`
-		return yaml.safeLoad(fs.readFileSync(workspaceFile, 'utf8'))
+		// I'm very confident that the configuration has the right format,
+		// because otherwise pnpm will not work
+		return yaml.load(fs.readFileSync(workspaceFile, 'utf8')) as PnpmWorkspaceConfig
 	})
 }
 

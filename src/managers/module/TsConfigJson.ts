@@ -2,16 +2,16 @@ import {
 	guessJsonIndentation, readJson, saveJson,
 } from '../../common/utils'
 
+interface TsReference {
+	path: string
+}
+
 interface TsConfigJsonContent {
 	files?: []
 	references?: TsReference[]
 }
 
 interface TsConfigJsonMeta {
-	path: string
-}
-
-interface TsReference {
 	path: string
 }
 
