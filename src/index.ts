@@ -28,6 +28,14 @@ interface ModulesFoundHookProps {
 	options: SetProjectReferencesOptions
 }
 
+interface FinishHookProps {
+	groupedModules: {
+		[name: string]: Module
+	}
+	saveTsConfigJson: typeof saveTsConfigJson
+	options: SetProjectReferencesOptions
+}
+
 interface ConfigurationHooks {
 	searchWorkspaces?: (root: string) => string[]
 	modulesFound?: (props: ModulesFoundHookProps) => ModulesFoundHookProps
@@ -49,13 +57,6 @@ function modulesFoundHook(
 		groupedModules,
 	}
 }
-interface FinishHookProps {
-	groupedModules: {
-		[name: string]: Module
-	}
-	saveTsConfigJson: typeof saveTsConfigJson
-	options: SetProjectReferencesOptions
-}
 
 function finishHook(): void {
 	// do nothing is the default
@@ -64,7 +65,8 @@ function finishHook(): void {
 function getConfiguration(options: SetProjectReferencesOptions): SetProjectReferencesConfg {
 	const configFile = path.resolve(options.root, 'set-project-references.js')
 	const hooks: ConfigurationHooks | undefined = fs.existsSync(configFile)
-		// eslint-disable-next-line import/no-dynamic-require, global-require
+		// eslint-disable-next-line max-len
+		// eslint-disable-next-line import/no-dynamic-require, global-require, @typescript-eslint/no-var-requires
 		? require(configFile)?.hooks
 		: undefined
 
@@ -136,7 +138,6 @@ function setProjectReferences(options: SetProjectReferencesOptions): void {
 			// eslint-disable-next-line no-continue
 			continue
 		}
-		// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 		const currentReferences = tsConfig.content.references?.map(reference => reference.path) ?? []
 		const desiredReferences = linkedModules
 			// create reference only to modules with tsconfig file

@@ -2,7 +2,6 @@ import {
 	WorkspaceManager, getWorkspaceManager,
 } from './WorkspaceManager'
 
-
 export class Workspace {
 	children: Workspace[] = []
 	constructor(

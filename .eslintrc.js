@@ -1,5 +1,6 @@
 module.exports = {
 	root: true,
+	reportUnusedDisableDirectives: true,
 	env: {
 		node: true,
 		jest: true,
@@ -19,7 +20,7 @@ module.exports = {
 		'no-console': 'error',
 		'no-trailing-spaces': 'error',
 		'no-restricted-syntax': 'off',
-		'indent': [
+		indent: [
 			'error',
 			'tab',
 		],
@@ -29,8 +30,8 @@ module.exports = {
 				ImportDeclaration: {
 					minProperties: 2,
 					multiline: true,
-				}
-			}
+				},
+			},
 		],
 		semi: [
 			'error',
@@ -41,24 +42,24 @@ module.exports = {
 			'single',
 			{
 				avoidEscape: true,
-				allowTemplateLiterals: true
-			}
+				allowTemplateLiterals: true,
+			},
 		],
 		'comma-dangle': [
 			'error',
-			'always-multiline'
+			'always-multiline',
 		],
 		'no-tabs': [
 			'error',
 			{
-				'allowIndentationTabs': true
-			}
+				allowIndentationTabs: true,
+			},
 		],
 		'sort-imports': [
 			'error',
 			{
 				ignoreDeclarationSort: true,
-			}
+			},
 		],
 		'arrow-parens': [
 			'error',
@@ -74,13 +75,13 @@ module.exports = {
 			'error',
 			{
 				multiline: {
-					delimiter: 'none'
-				}
-			}
+					delimiter: 'none',
+				},
+			},
 		],
 		'@typescript-eslint/indent': [
 			'error',
-			'tab'
+			'tab',
 		],
 		'import/prefer-default-export': 'off',
 		'import/no-default-export': 'error',
@@ -89,20 +90,21 @@ module.exports = {
 		'import/no-cycle': 'error',
 		// doesn't work for central devDependencies
 		'import/no-extraneous-dependencies': 'off',
+		'import/extensions': 'off',
 	},
 	overrides: [
 		{
 			files: ['**/*.js'],
 			rules: {
 				'@typescript-eslint/no-var-requires': 'off',
-				'@typescript-eslint/explicit-function-return-type': 'off'
+				'@typescript-eslint/explicit-function-return-type': 'off',
 			},
 		},
 		{
 			files: ['**/__tests__/**'],
 			rules: {
 				'@typescript-eslint/explicit-function-return-type': 'off',
-			}
+			},
 		},
 		{
 			files: ['**/*.ts', '**/*.d.ts'],
@@ -111,5 +113,5 @@ module.exports = {
 				'no-useless-constructor': 'off',
 			},
 		},
-	]
+	],
 }
