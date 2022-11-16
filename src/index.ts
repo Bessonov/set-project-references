@@ -4,7 +4,7 @@ import fs from 'fs'
 import program from 'commander'
 import path from 'path'
 import {
-	difference, isEqual, merge,
+	difference, isEqual, merge, sortBy
 } from 'lodash'
 import JSON from 'comment-json'
 import { version } from './package.json'
@@ -145,7 +145,7 @@ function setProjectReferences(options: SetProjectReferencesOptions): void {
 				!!nullOnNotfound(() => getTsConfigJson(linkedModule.path)))
 			.map(linkedModule => path.relative(module.path, linkedModule.path))
 
-		if (isEqual(currentReferences, desiredReferences) === false) {
+		if (isEqual(sortBy(currentReferences), sortBy(desiredReferences)) === false) {
 			everythingIsFine = false
 			const missingReferences = difference(desiredReferences, currentReferences)
 			const obsoleteReferences = difference(currentReferences, desiredReferences)
