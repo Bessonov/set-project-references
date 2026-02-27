@@ -4,7 +4,7 @@ import fs from 'fs'
 import program from 'commander'
 import path from 'path'
 import {
-	difference, isEqual, merge, sortBy
+	difference, isEqual, merge, sortBy,
 } from 'lodash'
 import JSON from 'comment-json'
 import { version } from './package.json'
@@ -179,6 +179,10 @@ function setProjectReferences(options: SetProjectReferencesOptions): void {
 		saveTsConfigJson,
 		options,
 	})
+
+	if (!everythingIsFine && options.useExitCode) {
+		process.exitCode = 1
+	}
 }
 
 program.version(version)
@@ -187,6 +191,7 @@ program
 	.option('-r, --root <path>', 'path to the root of monorepo', process.cwd())
 	.option('-s, --save', 'write changes to the files', false)
 	.option('-t, --indentation-ts-config <chars>', `indentation of tsconfig.json. Use $'\\t' for a tab`)
+	.option('-e, --use-exit-code', 'return a non-zero exit code if there are any discrepancies', false)
 	.action(setProjectReferences)
 
 program.parse(process.argv)
