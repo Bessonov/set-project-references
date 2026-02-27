@@ -143,7 +143,10 @@ function setProjectReferences(options: SetProjectReferencesOptions): void {
 			// create reference only to modules with tsconfig file
 			.filter((linkedModule): linkedModule is Module =>
 				!!nullOnNotfound(() => getTsConfigJson(linkedModule.path)))
-			.map(linkedModule => path.relative(module.path, linkedModule.path))
+			.map(linkedModule => {
+				// parse path using native path separators, but always format the output as posix
+				return path.relative(module.path, linkedModule.path).split(path.sep).join(path.posix.sep)
+			})
 
 		if (isEqual(sortBy(currentReferences), sortBy(desiredReferences)) === false) {
 			everythingIsFine = false
