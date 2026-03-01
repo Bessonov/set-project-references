@@ -1,12 +1,14 @@
 import fs from 'fs'
-import { getPnpmWorkspaceConfig } from '../PnpmUtils'
+import {
+	getPnpmWorkspaceConfig,
+} from '../PnpmUtils.js'
 
 function createSystemError(fn: () => void): Error {
 	try {
 		fn()
 		throw new Error(`error wasn't thrown for ${fn}`)
 	} catch (e) {
-		return e
+		return e as Error
 	}
 }
 
@@ -30,8 +32,8 @@ describe('test getPnpmWorkspaceConfig', () => {
 			packages: ['packages/*'],
 		})
 
-		expect(mockReadFileSync).toBeCalledWith('myworkspace/pnpm-workspace.yaml', 'utf8')
-		expect(mockReadFileSync).toBeCalledTimes(1)
+		expect(mockReadFileSync).toHaveBeenLastCalledWith('myworkspace/pnpm-workspace.yaml', 'utf8')
+		expect(mockReadFileSync).toHaveBeenCalledTimes(1)
 	})
 
 	it(`workspace can't be a directory`, () => {
@@ -40,7 +42,7 @@ describe('test getPnpmWorkspaceConfig', () => {
 		})
 
 		expect(() => getPnpmWorkspaceConfig('myworkspace'))
-			.toThrowError(`EISDIR: illegal operation on a directory, read`)
+			.toThrow(`EISDIR: illegal operation on a directory, read`)
 	})
 
 	it('no workspace if no file found', () => {

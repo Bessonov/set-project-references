@@ -1,12 +1,4 @@
-coverage/
-.eslintignore
-.eslintrc.js
-.npmignore
-.nvmrc
-.travis/
-.travis.yml
-jest.config.js
-tsconfig.json
-src/
+**
+!/dist/
+!/dist/**
 **/__tests__/**
-**/examples/**

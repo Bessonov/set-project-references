@@ -1,7 +1,10 @@
 import {
-	PackageJson, getPackageJson,
-} from './PackageJson'
-import { Workspace } from '../Workspace'
+	Workspace,
+} from '../Workspace.js'
+import {
+	getPackageJson,
+	PackageJson,
+} from './PackageJson.js'
 
 /*
 /my-app
@@ -26,7 +29,7 @@ export class Module {
 		public readonly path: string,
 		public readonly packageJson: PackageJson, // just for caching purpose
 		public readonly workspace: Workspace | null,
-	) { }
+	) {}
 }
 
 export function moduleFactory(path: string, workspace: Workspace | null): Module[] {

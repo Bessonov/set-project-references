@@ -1,0 +1,17 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"allowJs": true,
+		"noEmit": true,
+		"incremental": false,
+		"composite": false
+	},
+	"include": [
+		"eslint.config.mjs",
+		"tsconfig.eslint.json",
+		"jest.config.js"
+	],
+	"exclude": [
+		"**/.cache/"
+	]
+}

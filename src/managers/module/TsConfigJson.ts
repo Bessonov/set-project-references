@@ -1,6 +1,8 @@
 import {
-	guessJsonIndentation, readJson, saveJson,
-} from '../../common/utils'
+	guessJsonIndentation,
+	readJson,
+	saveJson,
+} from '../../common/utils.js'
 
 interface TsReference {
 	path: string
