@@ -1,14 +1,16 @@
-import fs from 'fs'
-import detectIndent from 'detect-indent'
 import JSON from 'comment-json'
-import { nullOnNotfound } from './FileUtils'
+import detectIndent from 'detect-indent'
+import fs from 'fs'
+import {
+	nullOnNotfound,
+} from './FileUtils.js'
 
 export function fileExists(filePath: string): boolean {
 	return fs.existsSync(filePath)
 }
 
 export function readJson<T>(filePath: string): T {
-	return JSON.parse(fs.readFileSync(filePath, { encoding: 'utf8' }))
+	return JSON.parse(fs.readFileSync(filePath, { encoding: 'utf8' })) as T
 }
 
 export function saveJson<T>(filePath: string, content: T, indentation: string): void {

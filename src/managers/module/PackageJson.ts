@@ -1,5 +1,9 @@
-import { nullOnNotfound } from '../../common/FileUtils'
-import { readJson } from '../../common/utils'
+import {
+	nullOnNotfound,
+} from '../../common/FileUtils.js'
+import {
+	readJson,
+} from '../../common/utils.js'
 
 interface PackageJsonMeta {
 	readonly path: string

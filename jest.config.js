@@ -13,6 +13,9 @@ module.exports = {
 	},
 	testRegex: '/__tests__/.*\\.(test|spec)\\.ts$',
 	moduleFileExtensions: [...defaults.moduleFileExtensions, 'ts'],
+	moduleNameMapper: {
+		'^(\\.{1,2}/.*)\\.js$': '$1',
+	},
 	coverageThreshold: {
 		global: {
 			// statements: 100,

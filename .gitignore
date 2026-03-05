@@ -1,4 +1,4 @@
 dist/
 node_modules/
 coverage/
-pnpm-lock.yaml
+__tests__/monorepo-pnpm/pnpm-lock.yaml

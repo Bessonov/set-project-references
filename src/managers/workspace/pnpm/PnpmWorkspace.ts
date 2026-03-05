@@ -1,25 +1,33 @@
-import glob from 'glob'
 import fs from 'fs'
-import path from 'path'
+import {
+	globSync,
+} from 'glob'
+import {
+	resolve,
+} from 'path'
+import {
+	Module,
+} from '../../module/Module.js'
+import {
+	WorkspaceManager,
+} from '../../WorkspaceManager.js'
 import {
 	getPnpmWorkspaceConfig,
 	isWorkspaceDependency as isWorkspaceDependencyUtil,
-} from './PnpmUtils'
-import { PnpmWorkspaceConfig } from './PnpmWorkspaceConfig'
-import { Module } from '../../module/Module'
-import { WorkspaceManager } from '../../WorkspaceManager'
+} from './PnpmUtils.js'
+import {
+	PnpmWorkspaceConfig,
+} from './PnpmWorkspaceConfig.js'
 
 export class PnpmWorkspaceManager implements WorkspaceManager {
-	// eslint-disable-next-line no-shadow
 	constructor(readonly path: string, private config: PnpmWorkspaceConfig) {
 	}
 
 	getModulePaths(): string[] {
 		return this.config.packages
 			// avoid recursion with '.' glob
-			// eslint-disable-next-line @typescript-eslint/no-extra-parens
-			.flatMap(pattern => (pattern === '.' ? [path.resolve(this.path)] : glob.sync(pattern, { cwd: this.path })))
-			.filter(pathFromPattern => fs.existsSync(`${path.resolve(this.path, pathFromPattern)}/package.json`))
+			.flatMap(pattern => (pattern === '.' ? [resolve(this.path)] : globSync(pattern, { cwd: this.path })))
+			.filter(pathFromPattern => fs.existsSync(`${resolve(this.path, pathFromPattern)}/package.json`))
 	}
 
 	isWorkspaceDependency = (module: Module, dependency: Module): boolean => {

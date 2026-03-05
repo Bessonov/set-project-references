@@ -2,7 +2,6 @@ Set project references for TypeScript
 =====================================
 
 [![Project is](https://img.shields.io/badge/Project%20is-fantastic-ff69b4.svg)](https://github.com/Bessonov/set-project-references)
-[![Build Status](https://api.travis-ci.org/Bessonov/set-project-references.svg?branch=master)](https://travis-ci.org/Bessonov/set-project-references)
 [![License](http://img.shields.io/:license-MIT-blue.svg)](https://raw.githubusercontent.com/Bessonov/set-project-references/master/LICENSE)
 
 This cli module try to resolve the problem of syncing [TypeScript project references](https://www.typescriptlang.org/docs/handbook/project-references.html) with local modules in a monorepo.
@@ -70,7 +69,7 @@ License
 
 The MIT License (MIT)
 
-Copyright (c) 2019, Anton Bessonov
+Copyright (c) 2019 - now, Anton Bessonov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

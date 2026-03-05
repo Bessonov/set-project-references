@@ -1,5 +1,9 @@
-import { pnpmWorkspaceManagerFactory } from './workspace/pnpm/PnpmWorkspace'
-import { Module } from './module/Module'
+import {
+	Module,
+} from './module/Module.js'
+import {
+	pnpmWorkspaceManagerFactory,
+} from './workspace/pnpm/PnpmWorkspace.js'
 
 export interface WorkspaceManager {
 	readonly path: string

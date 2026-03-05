@@ -1,10 +1,16 @@
 import fs from 'fs'
-import path from 'path'
 import yaml from 'js-yaml'
+import path from 'path'
 
-import { PnpmWorkspaceConfig } from './PnpmWorkspaceConfig'
-import { nullOnNotfound } from '../../../common/FileUtils'
-import { Module } from '../../module/Module'
+import {
+	nullOnNotfound,
+} from '../../../common/FileUtils.js'
+import {
+	Module,
+} from '../../module/Module.js'
+import {
+	PnpmWorkspaceConfig,
+} from './PnpmWorkspaceConfig.js'
 
 export function getPnpmWorkspaceConfig(workspacePath: string): PnpmWorkspaceConfig | null {
 	return nullOnNotfound<PnpmWorkspaceConfig>(() => {

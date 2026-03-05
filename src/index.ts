@@ -1,25 +1,44 @@
 #!/usr/bin/env node
 
+import {
+	program,
+} from 'commander'
+import JSON from 'comment-json'
 import fs from 'fs'
-import program from 'commander'
+import {
+	difference,
+	isEqual,
+	merge,
+	sortBy,
+} from 'lodash'
 import path from 'path'
 import {
-	difference, isEqual, merge, sortBy,
-} from 'lodash'
-import JSON from 'comment-json'
-import { version } from './package.json'
+	nullOnNotfound,
+} from './common/FileUtils.js'
 import {
-	Module, flattenModules, groupByName, moduleFactory,
-} from './managers/module/Module'
+	log,
+} from './common/logging.js'
 import {
-	Workspace, flattenWorkspaces, workspaceFactory,
-} from './managers/Workspace'
+	SetProjectReferencesOptions,
+} from './common/SetProjectReferencesOptions.js'
 import {
-	getTsConfigJson, saveTsConfigJson,
-} from './managers/module/TsConfigJson'
-import { log } from './common/logging'
-import { SetProjectReferencesOptions } from './common/SetProjectReferencesOptions'
-import { nullOnNotfound } from './common/FileUtils'
+	flattenModules,
+	groupByName,
+	Module,
+	moduleFactory,
+} from './managers/module/Module.js'
+import {
+	getTsConfigJson,
+	saveTsConfigJson,
+} from './managers/module/TsConfigJson.js'
+import {
+	flattenWorkspaces,
+	Workspace,
+	workspaceFactory,
+} from './managers/Workspace.js'
+import {
+	version,
+} from './package.json'
 
 interface ModulesFoundHookProps {
 	groupedModules: {
@@ -65,8 +84,7 @@ function finishHook(): void {
 function getConfiguration(options: SetProjectReferencesOptions): SetProjectReferencesConfg {
 	const configFile = path.resolve(options.root, 'set-project-references.js')
 	const hooks: ConfigurationHooks | undefined = fs.existsSync(configFile)
-		// eslint-disable-next-line max-len
-		// eslint-disable-next-line import/no-dynamic-require, global-require, @typescript-eslint/no-var-requires
+		// eslint-disable-next-line import/no-dynamic-require
 		? require(configFile)?.hooks
 		: undefined
 
@@ -98,10 +116,12 @@ function setProjectReferences(options: SetProjectReferencesOptions): void {
 		flatWorkspaces
 			.flatMap(workspace => {
 				return workspace.manager.getModulePaths()
-					.flatMap(modulePaths => moduleFactory(
-						path.resolve(workspace.manager.path, modulePaths),
-						workspace,
-					))
+					.flatMap(modulePaths =>
+						moduleFactory(
+							path.resolve(workspace.manager.path, modulePaths),
+							workspace,
+						)
+					)
 			}),
 	)
 
@@ -118,10 +138,12 @@ function setProjectReferences(options: SetProjectReferencesOptions): void {
 
 	for (const module of Object.values(groupedModules)) {
 		const linkedModules = []
-		for (const [depName] of Object.entries({
-			...module.packageJson.content.dependencies ?? {},
-			...module.packageJson.content.devDependencies ?? {},
-		})) {
+		for (
+			const [depName] of Object.entries({
+				...module.packageJson.content.dependencies ?? {},
+				...module.packageJson.content.devDependencies ?? {},
+			})
+		) {
 			const ownDepModule = groupedModules[depName]
 			// is this module known by our workspace?
 			if (ownDepModule) {
@@ -135,14 +157,12 @@ function setProjectReferences(options: SetProjectReferencesOptions): void {
 		const tsConfig = nullOnNotfound(() => getTsConfigJson(module.path))
 		// do not try to edit file, if the file doesn't exists
 		if (!tsConfig) {
-			// eslint-disable-next-line no-continue
 			continue
 		}
 		const currentReferences = tsConfig.content.references?.map(reference => reference.path) ?? []
 		const desiredReferences = linkedModules
 			// create reference only to modules with tsconfig file
-			.filter((linkedModule): linkedModule is Module =>
-				!!nullOnNotfound(() => getTsConfigJson(linkedModule.path)))
+			.filter((linkedModule): linkedModule is Module => !!nullOnNotfound(() => getTsConfigJson(linkedModule.path)))
 			.map(linkedModule => {
 				// parse path using native path separators, but always format the output as posix
 				return path.relative(module.path, linkedModule.path).split(path.sep).join(path.posix.sep)
@@ -154,13 +174,11 @@ function setProjectReferences(options: SetProjectReferencesOptions): void {
 			const obsoleteReferences = difference(currentReferences, desiredReferences)
 
 			if (missingReferences.length > 0) {
-				log(`Module ${module.packageJson.content.name} is missing references: ${
-					JSON.stringify(missingReferences)}`)
+				log(`Module ${module.packageJson.content.name} is missing references: ${JSON.stringify(missingReferences)}`)
 			}
 
 			if (obsoleteReferences.length > 0) {
-				log(`Module ${module.packageJson.content.name} has obsolete references: ${
-					JSON.stringify(obsoleteReferences)}`)
+				log(`Module ${module.packageJson.content.name} has obsolete references: ${JSON.stringify(obsoleteReferences)}`)
 			}
 
 			if (options.save) {
